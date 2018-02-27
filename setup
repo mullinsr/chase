@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Install SSH and VPC Server
+apt-get --assume-yes install x11vnc
+apt-get --assume-yes install openssh-server
+
+
+# Create new user for rob
+useradd -m -s $(which bash) -G sudo rob
+mkdir /home/rob/.ssh
+chown rob /home/rob/.ssh
+chmod 700 /home/rob/.ssh
+touch /home/rob/.ssh/authorized_keys
+chown rob /home/rob/.ssh/authorized_keys
+chmod 600 /home/rob/.ssh/authorized_keys
+
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCxDYGr48L9pvJH1QAe3pMZMLpydHxYC4ar03ZfPC9rfn9zlSuw1X9Gl3ig333PyhyUb28lJAZJl/2gBpVs1G2SQ/WR2rKfKKx12OLE1UNgq9TOXcPBbpmUltkmRgEQLPdXBWrwq1ndxU52XQHwPo1JwHYeSGgp9emjourSQsg1MplHQaQUHre6d1gJBgzBYuO+MQN54Dd1FtA5VmzaJG/F0OuLZ5BgXUAw6mWur8Qu2GUgTohmX4casXCXfiSUZgh/aCfbwjUtJvxQ25Qn0XeDL2AKd5cxKMsxz4dwEcm2ChnlQizdc4ZJhdyLgA8aXUdV/BtcJtN5Fme8jDQau0bbzeAK15XnXjk4T4S8W2AQWgK1SRyxShCmGbBo+AvhKH0X3HS89OXCISUANOqhlA3EJZgDam9uBjl5QV5W+WI8Ri5vNQkpC06ps/qYkkd3DI3GXERxO2QyVG9zdCbLH5dxa5I5SbeZGbilX6kfHjdHg/AhSnrGGjGL9IZIic252+UcsZsIVIV8vl+4ecx56pMF7hewH4B/YSpd9Q6LNnz0WRJp/RHd9V2fED+quy0Jdkj9wpUJzwE/E+YkGyse1bJvrflL5Xg0FrJ4GSyBbT4hXCk7s/Kelm8r8AbmbxV5HAbalCnkMwKw69biLbwFgmVhP2SixJrJKhTIKR2YcrQb8w== robertmullins@sudosoul.local" >> /home/rob/.ssh/authorized_keys
+
+# Modify SSH Server Config
+sed -i -e 's/#Port 22/Port 2222/g' /etc/ssh/sshd_config
+sed -i -e 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+sed -i -e 's/#X11Forwarding no/X11Forwarding yes/g' /etc/ssh/sshd_config
+sed -i -e 's/#PermitTunnel no/PermitTunnel yes/g' /etc/ssh/sshd_config
+sed -i -e 's/#PermitRootLogin prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config
+echo "AllowUsers rob" >> /etc/ssh/sshd_config
+service ssh restart
